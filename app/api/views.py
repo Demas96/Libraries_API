@@ -1,6 +1,6 @@
 import requests
 
-from django.http import HttpResponse
+from django.http import JsonResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, filters
 
@@ -9,10 +9,13 @@ from .serializers import LibrariesSerializer
 
 
 def parser(request):
+    count_lib = 0
     url = 'https://opendata.mkrf.ru/v2/libraries/$'
     headers = {'content-type': 'application/json',
                'X-API-KEY': 'ba73521d9c5049baed810349f63239baf6f4562244229965a408a5b9021b6a33'}
     r = requests.get(url, headers=headers)
+    if r.status_code != 200:
+        return JsonResponse({'status_code': r.status_code})
     data = r.json()['data']
     for i in data:
         lib = i['data']['general']
@@ -48,7 +51,8 @@ def parser(request):
                 image=lib['image']['url'],
                 locale=loc
             )
-    return HttpResponse('OK')
+            count_lib +=1
+    return JsonResponse({'status_code': r.status_code, 'added': count_lib})
 
 
 class LibrariesViewSet(viewsets.ModelViewSet):
