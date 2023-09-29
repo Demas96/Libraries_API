@@ -3,3 +3,4 @@ venv
 .idea
 Dockerfile
 .gitignore
+/app/db.sqlite3
